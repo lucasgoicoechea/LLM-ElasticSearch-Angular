@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Equipment Catalog Gateway
+  version: 1.0.0
+paths:
+  /api/equipment:
+    get:
+      operationId: listEquipment
+      responses:
+        "200":
+          description: Equipment list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Equipment"
+        "502":
+          $ref: "#/components/responses/BackendUnavailable"
+    post:
+      operationId: createEquipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentWriteRequest"
+      responses:
+        "201":
+          description: Equipment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipment"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          $ref: "#/components/responses/EquipmentCodeConflict"
+        "502":
+          $ref: "#/components/responses/BackendUnavailable"
+  /api/equipment/{equipment_id}:
+    parameters:
+      - $ref: "#/components/parameters/EquipmentId"
+    get:
+      operationId: getEquipment
+      responses:
+        "200":
+          description: Equipment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipment"
+        "404":
+          $ref: "#/components/responses/EquipmentNotFound"
+        "502":
+          $ref: "#/components/responses/BackendUnavailable"
+    put:
+      operationId: updateEquipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentWriteRequest"
+      responses:
+        "200":
+          description: Equipment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipment"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/EquipmentNotFound"
+        "409":
+          $ref: "#/components/responses/EquipmentCodeConflict"
+        "502":
+          $ref: "#/components/responses/BackendUnavailable"
+    delete:
+      operationId: deleteEquipment
+      responses:
+        "204":
+          description: Equipment deleted
+        "404":
+          $ref: "#/components/responses/EquipmentNotFound"
+        "502":
+          $ref: "#/components/responses/BackendUnavailable"
+components:
+  parameters:
+    EquipmentId:
+      name: equipment_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    ValidationError:
+      description: Invalid request payload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    EquipmentNotFound:
+      description: Equipment does not exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    EquipmentCodeConflict:
+      description: Equipment code already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    BackendUnavailable:
+      description: Equipment backend is unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    Equipment:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: "#/components/schemas/EquipmentStatus"
+    EquipmentWriteRequest:
+      type: object
+      additionalProperties: false
+      required: [code, name, status]
+      properties:
+        code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 120
+        status:
+          $ref: "#/components/schemas/EquipmentStatus"
+    EquipmentStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE]
+    ApiFieldError:
+      type: object
+      additionalProperties: false
+      required: [field, message]
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiFieldError"

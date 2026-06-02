@@ -1,0 +1,19 @@
+.atl/
+
+# Gradle
+.gradle/
+backend/.gradle/
+backend/build/
+backend/.kotlin/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+gateway/.venv/
+gateway/*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.iml
