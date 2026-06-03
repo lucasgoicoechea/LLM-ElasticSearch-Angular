@@ -1,4 +1,81 @@
-<main>
-  <h1>Equipment Catalog</h1>
-  <p>Angular equipment client is ready.</p>
+﻿<main>
+  <section>
+    <h1>Equipment Catalog</h1>
+  </section>
+
+  <p aria-live="polite">{{ isLoading ? 'Loading equipment...' : '' }}</p>
+
+  @if (error) {
+    <section role="alert" aria-label="Equipment error">
+      <strong>{{ error.code }}: {{ error.message }}</strong>
+      @if (error.errors?.length) {
+        <ul>
+          @for (fieldError of error.errors; track fieldError.field + fieldError.message) {
+            <li>{{ fieldError.field }}: {{ fieldError.message }}</li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <section aria-labelledby="equipment-form-title">
+    <h2 id="equipment-form-title">{{ editingId ? 'Edit equipment' : 'Create equipment' }}</h2>
+    <form (ngSubmit)="saveEquipment()">
+      <label>
+        Code
+        <input name="code" [(ngModel)]="form.code" required />
+      </label>
+
+      <label>
+        Name
+        <input name="name" [(ngModel)]="form.name" required />
+      </label>
+
+      <label>
+        Status
+        <select name="status" [(ngModel)]="form.status">
+          @for (status of statuses; track status) {
+            <option [value]="status">{{ status }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="submit" [disabled]="isLoading">Save equipment</button>
+      @if (editingId) {
+        <button type="button" (click)="resetForm()">Cancel edit</button>
+      }
+    </form>
+  </section>
+
+  <section aria-labelledby="equipment-list-title">
+    <h2 id="equipment-list-title">Equipment</h2>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Code</th>
+          <th scope="col">Name</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of equipment; track item.id) {
+          <tr>
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.status }}</td>
+            <td>
+              <button type="button" (click)="editEquipment(item)">Edit {{ item.code }}</button>
+              <button type="button" (click)="deleteEquipment(item)">Delete {{ item.code }}</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">No equipment found.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
 </main>
+
