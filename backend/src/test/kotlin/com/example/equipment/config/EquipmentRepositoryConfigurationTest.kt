@@ -1,9 +1,12 @@
 package com.example.equipment.config
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import com.example.equipment.adapter.elasticsearch.ElasticsearchEquipmentRepository
 import com.example.equipment.adapter.inmemory.InMemoryEquipmentRepository
 import com.example.equipment.application.EquipmentRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 
 class EquipmentRepositoryConfigurationTest {
@@ -31,14 +34,14 @@ class EquipmentRepositoryConfigurationTest {
     }
 
     @Test
-    fun `fails fast when elasticsearch is selected before the adapter slice`() {
+    fun `uses the elasticsearch adapter when selected`() {
         contextRunner
             .withPropertyValues("equipment.repository=elasticsearch")
+            .withBean(ElasticsearchClient::class.java, { mock(ElasticsearchClient::class.java) })
             .run { context ->
-                assertThat(context).hasFailed()
-                assertThat(context.startupFailure).hasRootCauseMessage(
-                    "Elasticsearch repository adapter is implemented in the next slice",
-                )
+                assertThat(context).hasSingleBean(EquipmentRepository::class.java)
+                assertThat(context.getBean(EquipmentRepository::class.java))
+                    .isInstanceOf(ElasticsearchEquipmentRepository::class.java)
             }
     }
 }

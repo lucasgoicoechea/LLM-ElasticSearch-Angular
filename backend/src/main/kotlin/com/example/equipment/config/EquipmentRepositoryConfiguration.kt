@@ -1,5 +1,7 @@
 package com.example.equipment.config
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import com.example.equipment.adapter.elasticsearch.ElasticsearchEquipmentRepository
 import com.example.equipment.adapter.inmemory.InMemoryEquipmentRepository
 import com.example.equipment.application.EquipmentRepository
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -23,6 +25,6 @@ class EquipmentRepositoryConfiguration {
         name = ["repository"],
         havingValue = "elasticsearch",
     )
-    fun elasticsearchEquipmentRepository(): EquipmentRepository =
-        throw IllegalStateException("Elasticsearch repository adapter is implemented in the next slice")
+    fun elasticsearchEquipmentRepository(client: ElasticsearchClient): EquipmentRepository =
+        ElasticsearchEquipmentRepository(client)
 }
