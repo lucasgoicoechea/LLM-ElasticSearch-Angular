@@ -20,10 +20,14 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+    implementation("co.elastic.clients:elasticsearch-java:8.18.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(kotlin("reflect"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.testcontainers:elasticsearch:1.21.1")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -33,4 +37,5 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    systemProperty("api.version", "1.44")
 }

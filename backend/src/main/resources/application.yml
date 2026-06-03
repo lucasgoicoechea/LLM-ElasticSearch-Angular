@@ -2,3 +2,8 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+
+equipment:
+  repository: ${EQUIPMENT_REPOSITORY:in-memory}
